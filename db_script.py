@@ -12,13 +12,13 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 
 # 1. Create a view of instructors without their salary
-cursor.execute("CREATE OR REPLACE VIEW faculty AS SELECT ID, name, dept_name FROM instructor")
+cursor.execute("CREATE OR REPLACE VIEW faculty AS SELECT ID, name, dept_name FROM instrucor")
 
 # 2. Create a view of department salary totals
 cursor.execute("""
     CREATE OR REPLACE VIEW dept_salary_totals AS 
     SELECT dept_name, SUM(salary) AS total_salary 
-    FROM instructor 
+    FROM instrucor 
     GROUP BY dept_name
 """)
 
