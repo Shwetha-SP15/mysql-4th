@@ -1,77 +1,55 @@
 import mysql.connector
 import time
 
-
+# Connect to MySQL
 conn = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password='root',        # ✅ exact password you're typing in terminal
-    database='ADBMS'        # ✅ ensure this database exists
+    host="localhost",
+    user="root",              # change if using a different user
+    password="root",          # update your password if needed
+    database="ADBMS"
 )
 
 cursor = conn.cursor()
 
-# 1. Create a view of instructors without their salary
-cursor.execute("CREATE OR REPLACE VIEW faculty AS SELECT ID, name, dept_name FROM instrucor")
+print("\n---- Instructor Table Data ----")
+# Fetch all records from instrucor (note the spelling)
+cursor.execute("SELECT * FROM instrucor")
+instructors = cursor.fetchall()
+for row in instructors:
+    print(row)
 
-# 2. Create a view of department salary totals
-cursor.execute("""
-    CREATE OR REPLACE VIEW dept_salary_totals AS 
-    SELECT dept_name, SUM(salary) AS total_salary 
-    FROM instrucor 
-    GROUP BY dept_name
-""")
+print("\n---- Teaches Table Data ----")
+# Fetch all records from Teaches
+cursor.execute("SELECT * FROM Teaches")
+teaches = cursor.fetchall()
+for row in teaches:
+    print(row)
 
-# 3. Create a role named student
-cursor.execute("CREATE ROLE IF NOT EXISTS `student`")
-
-# 4. Give SELECT privileges on view faculty to the role student
-cursor.execute("GRANT SELECT ON faculty TO `student`")
-
-# 5. Create a new user and assign the student role
-cursor.execute("CREATE USER IF NOT EXISTS 'student_user'@'localhost' IDENTIFIED BY 'password123'")
-cursor.execute("GRANT `student` TO 'student_user'@'localhost'")
-
-# 6. Revoke privileges of the new user
-cursor.execute("REVOKE `student` FROM 'student_user'@'localhost'")
-
-# 7. Remove the role of student
-cursor.execute("DROP ROLE IF EXISTS `student`")
-
-# 8. Give SELECT privileges directly to the user
-cursor.execute("GRANT SELECT ON faculty TO 'student_user'@'localhost'")
-
-# 9. Create table teaches2 with ENUM constraint on semester
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS teaches2 (
-        ID VARCHAR(10),
-        course_id VARCHAR(10),
-        sec_id VARCHAR(10),
-        semester ENUM('Fall', 'Winter', 'Spring', 'Summer'),
-        year INT
-    )
-""")
-
-# 10. Index timing comparison on Teaches.ID
-try:
-    cursor.execute("DROP INDEX idx_id ON Teaches")
-except:
-    pass  # Ignore if index doesn't exist
-
-start = time.time()
+# Measure query time without index
+print("\n---- Query Performance Without Index ----")
+start_time = time.time()
 cursor.execute("SELECT * FROM Teaches WHERE ID = '10101'")
-print("Time without index:", time.time() - start)
+_ = cursor.fetchall()  # must fetch results to clear unread result
+end_time = time.time()
+print("Time without index:", end_time - start_time, "seconds")
 
+# Create index on Teaches(ID)
+print("\nCreating index 'idx_id' on Teaches(ID)...")
 cursor.execute("CREATE INDEX idx_id ON Teaches(ID)")
 
-start = time.time()
+# Measure query time with index
+print("\n---- Query Performance With Index ----")
+start_time = time.time()
 cursor.execute("SELECT * FROM Teaches WHERE ID = '10101'")
-print("Time with index:", time.time() - start)
+_ = cursor.fetchall()
+end_time = time.time()
+print("Time with index:", end_time - start_time, "seconds")
 
-# 11. Drop index to free space
+# Optional: Drop the index (cleanup)
+print("\nDropping index 'idx_id' from Teaches...")
 cursor.execute("DROP INDEX idx_id ON Teaches")
 
-# Final commit and cleanup
-conn.commit()
+# Done
 cursor.close()
 conn.close()
+print("\nAll operations completed successfully.")
