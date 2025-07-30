@@ -52,24 +52,24 @@ cursor.execute("""
     )
 """)
 
-# 10. Index timing comparison on teaches.ID
+# 10. Index timing comparison on Teaches.ID
 try:
-    cursor.execute("DROP INDEX idx_id ON teaches")
+    cursor.execute("DROP INDEX idx_id ON Teaches")
 except:
     pass  # Ignore if index doesn't exist
 
 start = time.time()
-cursor.execute("SELECT * FROM teaches WHERE ID = '10101'")
+cursor.execute("SELECT * FROM Teaches WHERE ID = '10101'")
 print("Time without index:", time.time() - start)
 
-cursor.execute("CREATE INDEX idx_id ON teaches(ID)")
+cursor.execute("CREATE INDEX idx_id ON Teaches(ID)")
 
 start = time.time()
-cursor.execute("SELECT * FROM teaches WHERE ID = '10101'")
+cursor.execute("SELECT * FROM Teaches WHERE ID = '10101'")
 print("Time with index:", time.time() - start)
 
 # 11. Drop index to free space
-cursor.execute("DROP INDEX idx_id ON teaches")
+cursor.execute("DROP INDEX idx_id ON Teaches")
 
 # Final commit and cleanup
 conn.commit()
