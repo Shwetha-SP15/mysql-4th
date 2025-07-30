@@ -1,12 +1,14 @@
 import mysql.connector
 import time
 
+
 conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",    # ✅ Replace with actual password
-    database="ADBMS"           # ✅ Replace with actual database
+    host='localhost',
+    user='root',
+    password='root',        # ✅ exact password you're typing in terminal
+    database='ADBMS'        # ✅ ensure this database exists
 )
+
 cursor = conn.cursor()
 
 # 1. Create a view of instructors without their salary
