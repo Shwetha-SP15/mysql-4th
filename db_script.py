@@ -4,8 +4,8 @@ import time
 conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="your_password",    # ✅ Replace with actual password
-    database="db_name"           # ✅ Replace with actual database
+    password="root",    # ✅ Replace with actual password
+    database="ADBMS"           # ✅ Replace with actual database
 )
 cursor = conn.cursor()
 
